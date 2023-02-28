@@ -4,7 +4,8 @@ commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
-      # Add parameter here   
+       workflow_id:
+        type: string 
     steps:
       - run:
           name: Destroy environments
@@ -16,7 +17,8 @@ commands:
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
-      # Add parameter here     
+      workflow_id:
+        type: string
     steps:
       - run:
           name: Revert migrations
@@ -35,7 +37,7 @@ commands:
 jobs:
   build-frontend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -44,7 +46,9 @@ jobs:
           name: Build front-end
           command: |
             # Your code here
-            exit 1
+            cd frontend
+            npm install
+            npm run build
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -60,46 +64,49 @@ jobs:
           name: Back-end build
           command: |
              # Your code here
-             exit 1
+             cd backend
+             npm install
+             npm run build
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
 
-  test-frontend:
-    docker:
-      # Docker image here
-    steps:
-      # Checkout code from git
-      # Restore from cache
-      # Your job code here
+  # test-frontend:
+  #   docker:
+  #     # Docker image here
+  #   steps:
+  #     # Checkout code from git
+  #     # Restore from cache
+  #     # Your job code here
                 
-  test-backend:
-    docker:
-      # Docker image here
-    steps:
-      # Checkout code from git
-      # Restore from cache
-      # Your job code here
+  # test-backend:
+  #   docker:
+  #     # Docker image here
+  #   steps:
+  #     # Checkout code from git
+  #     # Restore from cache
+  #     # Your job code here
             
-  scan-frontend:
-    docker:
-      # Docker image here
-    steps:
-      # Checkout code from git
-      # Restore from cache
-      # Your job code here
+  # scan-frontend:
+  #   docker:
+  #     # Docker image here
+  #   steps:
+  #     # Checkout code from git
+  #     # Restore from cache
+  #     # Your job code here
 
-  scan-backend:
-    docker:
-      # Docker image here
-    steps:
-      # Checkout code from git
-      # Restore from cache
-      # Your job code here
+  # scan-backend:
+  #   docker:
+  #     # Docker image here
+  #   steps:
+  #     # Checkout code from git
+  #     # Restore from cache
+  #     # Your job code here
 
   deploy-infrastructure:
     docker:
       # Docker image here that supports AWS CLI
+      - image: cimg/aws:2023.01
     steps:
       # Checkout code from git
       - run:
@@ -134,6 +141,7 @@ jobs:
   configure-infrastructure:
     docker:
       # Docker image here that supports Ansible
+      - image: python:3.9.16
     steps:
       # Checkout code from git
       # Add ssh keys with fingerprint
@@ -153,6 +161,7 @@ jobs:
   run-migrations:
     docker:
       # Docker image here that supports NodeJS
+      - image: cimg/node:13.8.0
     steps:
       # Checkout code from git
       - run:
@@ -170,6 +179,7 @@ jobs:
   deploy-frontend:
     docker:
       # Docker image here that supports AWS CLI
+      - image: cimg/aws:2023.01
     steps:
       # Checkout code from git
       - run:
@@ -191,6 +201,7 @@ jobs:
   deploy-backend:
     docker:
       # Docker image here that supports Ansible
+      - image: python:3.9.16
     steps:
       # Checkout code from git
       # Add ssh keys with fingerprint
@@ -208,6 +219,7 @@ jobs:
   smoke-test:
     docker:
       # Lightweight Docker image 
+      - image: python:3.7-alpine3.11
     steps:
       # Checkout code from git
       - run:
@@ -231,6 +243,7 @@ jobs:
   cloudfront-update:
     docker:
       # Docker image here that supports AWS CLI
+      - image: cimg/aws:2023.01
     steps:
       # Checkout code from git
       - run:
@@ -268,30 +281,30 @@ workflows:
     jobs:
       - build-frontend
       - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-          requires: [build-backend]
-      - scan-backend:
-          requires: [build-backend]
-      - scan-frontend:
-          requires: [build-frontend]
-      - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-          filters:
-            branches:
-              only: [test-feature-branch]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations]
-      - deploy-backend:
-          requires: [run-migrations]
-      - smoke-test:
-          requires: [deploy-backend, deploy-frontend]
-      - cloudfront-update:
-          requires: [smoke-test]
-      - cleanup:
-          requires: [cloudfront-update]
+      # - test-frontend:
+      #     requires: [build-frontend]
+      # - test-backend:
+      #     requires: [build-backend]
+      # - scan-backend:
+      #     requires: [build-backend]
+      # - scan-frontend:
+      #     requires: [build-frontend]
+      # - deploy-infrastructure:
+      #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      #     filters:
+      #       branches:
+      #         only: [test-feature-branch]
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
+      # - run-migrations:
+      #     requires: [configure-infrastructure]
+      # - deploy-frontend:
+      #     requires: [run-migrations]
+      # - deploy-backend:
+      #     requires: [run-migrations]
+      # - smoke-test:
+      #     requires: [deploy-backend, deploy-frontend]
+      # - cloudfront-update:
+      #     requires: [smoke-test]
+      # - cleanup:
+      #     requires: [cloudfront-update]

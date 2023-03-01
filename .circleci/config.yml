@@ -133,16 +133,17 @@ jobs:
   deploy-infrastructure:
     docker:
       # Docker image here that supports AWS CLI
-      # - image: cimg/aws:2023.01
-      - image: cimg/base:2021.04
+      - image: cimg/aws:2023.01
+      # - image: cimg/base:2021.04
+      
     steps:
       - checkout
       - run:
           name: Install tar
           command: |
-            # yum -y install tar gzip
-            sudo apt update
-            sudo apt install -y tar gzip curl software-properties-common
+            yum -y install tar gzip
+            # sudo apt update
+            # sudo apt install -y tar gzip curl software-properties-common
       - run:
           name: Ensure back-end infrastructure exists #Something ti trigger a build
           command: |

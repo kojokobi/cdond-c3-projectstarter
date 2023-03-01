@@ -85,7 +85,6 @@ jobs:
             cd frontend
             npm install
             npm run test
-      
                 
   test-backend:
     docker:

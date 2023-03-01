@@ -1,6 +1,24 @@
 version: 2.1
 
 commands:
+  dependencies:
+    steps:
+      - run:
+          name: Installing necessary packages
+          command: |
+            sudo apt update
+            sudo apt install -y tar gzip curl software-properties-common
+      - run:
+          name: Installing aws-cli
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+      - run:
+          name: Installing ansible
+          command: |
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
@@ -132,18 +150,10 @@ jobs:
 
   deploy-infrastructure:
     docker:
-      # Docker image here that supports AWS CLI
-      - image: cimg/aws:2023.01
-      # - image: cimg/base:2021.04
-      
+      - image: cimg/base:2021.04
     steps:
       - checkout
-      # - run:
-      #     name: Install tar
-      #     command: |
-      #       yum -y install tar gzip
-      #       # sudo apt update
-      #       # sudo apt install -y tar gzip curl software-properties-common
+      - dependencies
       - run:
           name: Ensure back-end infrastructure exists #Something ti trigger a build
           command: |

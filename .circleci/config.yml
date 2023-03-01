@@ -138,12 +138,12 @@ jobs:
       
     steps:
       - checkout
-      - run:
-          name: Install tar
-          command: |
-            yum -y install tar gzip
-            # sudo apt update
-            # sudo apt install -y tar gzip curl software-properties-common
+      # - run:
+      #     name: Install tar
+      #     command: |
+      #       yum -y install tar gzip
+      #       # sudo apt update
+      #       # sudo apt install -y tar gzip curl software-properties-common
       - run:
           name: Ensure back-end infrastructure exists #Something ti trigger a build
           command: |

@@ -8,12 +8,12 @@ commands:
           command: |
             sudo apt update
             sudo apt install -y tar gzip curl software-properties-common
-      - run:
-          name: Installing aws-cli
-          command: |
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
+      # - run:
+      #     name: Installing aws-cli
+      #     command: |
+      #       curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+      #       unzip awscliv2.zip
+      #       sudo ./aws/install
       - run:
           name: Installing ansible
           command: |
@@ -150,8 +150,8 @@ jobs:
 
   deploy-infrastructure:
     docker:
-      - image: cimg/base:2021.04
-      # - image: cimg/aws:2023.03
+      # - image: cimg/base:2021.04
+      - image: cimg/aws:2023.01
     steps:
       - checkout
       - dependencies
@@ -161,7 +161,9 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
+              --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" \
+              --region us-east-1 \
               --tags project=udapeople
               
       - run:

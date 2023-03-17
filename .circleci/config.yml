@@ -340,7 +340,10 @@ workflows:
     jobs:
 
       # my tests
-      - deploy-infrastructure
+      # - deploy-infrastructure
+      - configure-infrastructure
+
+
       # - build-frontend
       # - build-backend
       # - test-frontend:

@@ -162,6 +162,7 @@ jobs:
           name: get ec2 Ip
           command: |
               aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> .circleci/ansible/inventory.txt
+              cat .circleci/ansible/inventory.txt
               
       # - run:
       #     name: Ensure back-end infrastructure exists #Something ti trigger a build

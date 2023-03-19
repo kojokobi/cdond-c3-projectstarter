@@ -149,9 +149,6 @@ jobs:
             npm install
             npm audit fix --audit-level=critical --force
 
- 
-
-
   deploy-infrastructure:
     docker:
       - image: cimg/aws:2023.01
@@ -198,7 +195,6 @@ jobs:
             - project/.circleci/ansible/inventory.txt
       - destroy-environment:
           workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
-        
 
   configure-infrastructure:
     docker:
@@ -233,16 +229,20 @@ jobs:
       - image: cimg/node:13.8.0
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/
       - run:
           name: Run migrations
           command: |
             cd backend
             npm install
-            npm install migrations > migrations_dump.txt
+            npm install migrations > migrations_output.txt
+            cat migration_output.txt
+
       - run:
           name: Send migration results to memstash
           command: |
-              if grep -q grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+              if grep -q grep -q "has been executed successfully." ~/project/backend/migrations_output.txt
               then
                     curl https://kvdb.io/Dtvdyf99ArqNWh3EFf1rNi/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
               fi
@@ -364,38 +364,42 @@ cleanup:
 workflows:
   default:
     jobs:
-      # - deploy-infrastructure
-      - build_backend
-      - build_frontend
-      - test_backend:
-          requires:
-            - build_backend
-      - test_frontend:
-          requires:
-            - build_frontend
-      # - analyze_backend:
+
+      - deploy-infrastructure
+      - configure-infrastructure 
+      - run-migrations
+
+      # - build-backend
+      # - build-frontend
+      # - test_backend:
+      #     requires:
+      #       - build-backend
+      # - test_frontend:
+      #     requires:
+      #       - build-frontend
+      # - scan-backend:
       #     requires:
       #       - test_backend
-      # - analyze_frontend:
+      # - scan-frontend:
       #     requires:
       #       - test_frontend
-      - deploy_backend_infrastructure:
-          # requires:
-          #   - analyze_backend
-          #   - analyze_frontend
-          filters:
-              branches:
-                only: [ master ]
-      - deploy_frontend_infrastructure:
-          # requires:
-          #   - analyze_backend
-          #   - analyze_frontend
-          # filters:
-            branches:
-              only: [ master ]
-      - run_db_migrations_for_backend:
-          requires:
-            - deploy_backend_infrastructure
+      # - deploy_backend_infrastructure:
+      #     requires:
+      #       - scan_backend
+      #       - scan_frontend
+      #     filters:
+      #         branches:
+      #           only: [ master ]
+      # - deploy_frontend_infrastructure:
+      #     requires:
+      #       - scan_backend
+      #       - scan_frontend
+      #     filters:
+      #       branches:
+      #         only: [ master ]
+      # - run_db_migrations_for_backend:
+      #     requires:
+      #       - deploy_backend_infrastructure
          
       
             

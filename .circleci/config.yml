@@ -225,8 +225,8 @@ jobs:
 
   run-migrations:
     docker:
-      # Docker image here that supports NodeJS
-      - image: cimg/node:13.8.0
+      # - image: cimg/node:13.8.0
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - attach_workspace:
@@ -246,6 +246,8 @@ jobs:
               then
                     curl https://kvdb.io/Dtvdyf99ArqNWh3EFf1rNi/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
               fi
+      - destroy-environment:
+          workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
     # Dtvdyf99ArqNWh3EFf1rNi
     # Here's where you will add some code to rollback on failure
     # name = 32huAaHdSpQL9ECfBWzFCL

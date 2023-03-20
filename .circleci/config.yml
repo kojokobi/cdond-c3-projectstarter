@@ -24,7 +24,7 @@ commands:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
        workflow_id:
-        type: string 
+        type: "string"
     steps:
       - run:
           name: Destroy environments
@@ -247,26 +247,29 @@ jobs:
               then
                     curl https://kvdb.io/Dtvdyf99ArqNWh3EFf1rNi/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
               fi
-    # Dtvdyf99ArqNWh3EFf1rNi
-    # Here's where you will add some code to rollback on failure 34.198.239.149
-    # name = 32huAaHdSpQL9ECfBWzFCL
-    # curl https://kvdb.io/9GE4jRtKznmVKRfvdBABBe/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'  
+   
 
   deploy-frontend:
     docker:
-      # Docker image here that supports AWS CLI
-      - image: cimg/aws:2023.01
+      # - image: cimg/aws:2023.01
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/
       - run:
           name: Install dependencies
           command: |
-              aws cloudformation deploy \
-              --template-file .circleci/cloudformation/frontend_infrastructure.yml \
-              --parameter-overrides ID="prod-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --stack-name udapeople-frontend-prod-${CIRCLE_WORKFLOW_ID:0:7}
-      # - destroy_environment:
-      #     workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
+              apk add curl
+              apk add --upgrade bash
+              apk add --update ansible
+              apk add openssh-client
+              pip3 install awscli
+              
+
+      - destroy-environment:
+          workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
+
       - run:
           name: Get backend url
           command: |
@@ -275,6 +278,7 @@ jobs:
             echo "API_URL = ${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
             cat frontend/.env
+
       - run:
           name: Deploy frontend objects
           command: |

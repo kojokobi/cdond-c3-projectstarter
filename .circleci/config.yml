@@ -240,15 +240,15 @@ jobs:
         # trigger push
             
 
-      # - run:
-      #     name: Send migration results to memstash
-      #     command: |
-      #         if grep -q grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
-      #         then
-      #               curl https://kvdb.io/Dtvdyf99ArqNWh3EFf1rNi/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
-      #         fi
+      - run:
+          name: Send migration results to memstash
+          command: |
+              if grep -q grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+              then
+                    curl https://kvdb.io/Dtvdyf99ArqNWh3EFf1rNi/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+              fi
     # Dtvdyf99ArqNWh3EFf1rNi
-    # Here's where you will add some code to rollback on failure
+    # Here's where you will add some code to rollback on failure 34.198.239.149
     # name = 32huAaHdSpQL9ECfBWzFCL
     # curl https://kvdb.io/9GE4jRtKznmVKRfvdBABBe/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'  
 

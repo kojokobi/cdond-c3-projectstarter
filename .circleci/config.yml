@@ -373,6 +373,7 @@ workflows:
       - deploy-infrastructure
       - configure-infrastructure 
       - run-migrations
+      - deploy-frontend
 
       # - build-backend
       # - build-frontend

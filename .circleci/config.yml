@@ -23,7 +23,7 @@ commands:
             sudo add-apt-repository --yes --update ppa:ansible/ansible
             sudo apt install ansible
             
-  destroy-environment:
+  destroy_environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
        workflow_id:
@@ -38,7 +38,7 @@ commands:
             aws s3 rb s3://udapeople-<< parameters.workflow_id >> --force
             exit 1
 
-  revert-migrations:
+  revert_migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
       workflow_id:
@@ -59,7 +59,7 @@ commands:
             fi
             
 jobs:
-  build-frontend:
+  build_frontend:
     docker:
       - image: cimg/node:13.8.0
     steps:
@@ -77,7 +77,7 @@ jobs:
           paths: [frontend/node_modules]
           key: frontend-build
 
-  build-backend:
+  build_backend:
     docker:
       - image: circleci/node:13.8.0
     steps:
@@ -95,7 +95,7 @@ jobs:
           paths: [backend/node_modules]
           key: backend-build
 
-  test-frontend:
+  test_frontend:
     docker:
       # Docker image here
       - image: cimg/node:13.8.0
@@ -110,7 +110,7 @@ jobs:
             npm install
             npm run test
                 
-  test-backend:
+  test_backend:
     docker:
       - image: cimg/node:13.8.0
     steps:
@@ -124,7 +124,7 @@ jobs:
             npm install
             npm run test
             
-  scan-frontend:
+  scan_frontend:
     docker:
       - image: cimg/node:13.8.0
     steps:
@@ -138,7 +138,7 @@ jobs:
             npm install
             npm audit fix --audit-level=critical --force
 
-  scan-backend:
+  scan_backend:
     docker:
       - image: cimg/node:13.8.0
     steps:
@@ -152,20 +152,15 @@ jobs:
             npm install
             npm audit fix --audit-level=critical --force
 
-  deploy-infrastructure:
+  deploy_infrastructure:
     docker:
       - image: cimg/aws:2023.01
     steps:
       - checkout
       - dependencies
-      # - run:
-      #     name: get ec2 Ip
-      #     command: |
-      #         aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> .circleci/ansible/inventory.txt
-      #         cat .circleci/ansible/inventory.txt
-              
+            
       - run:
-          name: Ensure back-end infrastructure exists #Something to trigger a build
+          name: Ensure back-end infrastructure exists
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
@@ -173,8 +168,7 @@ jobs:
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
               --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" \
               --region us-east-1 \
-              --tags project=udapeople
-              
+              --tags project=udapeople       
       - run:
           name: Ensure front-end infrastructure exists
           command: |
@@ -184,14 +178,12 @@ jobs:
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
               --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" \
               --region us-east-1 \
-              --tags project=udapeople
-              
+              --tags project=udapeople           
       - run:
           name: Add back-end ip to ansible inventory
           command: |
              aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> .circleci/ansible/inventory.txt
              cat .circleci/ansible/inventory.txt
-
       - persist_to_workspace:
           root: ~/
           paths:
@@ -199,10 +191,8 @@ jobs:
       - destroy-environment:
           workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
 
-  configure-infrastructure:
+  configure_infrastructure:
     docker:
-      # Docker image here that supports Ansible
-      # - image: python:3.9.16
       - image: python:3.7-alpine3.11
     steps:
       - checkout
@@ -226,7 +216,7 @@ jobs:
             ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/configure-server.yml
       # Here's where you will add some code to rollback on failure      
 
-  run-migrations:
+  run_migrations:
     docker:
       - image: cimg/node:13.8.0
     steps:
@@ -239,10 +229,6 @@ jobs:
             cd backend
             npm install
             npm run migrations >> migrations_dump.txt
-
-        # trigger push
-            
-
       - run:
           name: Send migration results to memstash
           command: |
@@ -250,9 +236,8 @@ jobs:
               then
                     curl https://kvdb.io/Dtvdyf99ArqNWh3EFf1rNi/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
               fi
-   
 
-  deploy-frontend:
+  deploy_frontend:
     docker:
       # - image: cimg/aws:2023.01
       - image: python:3.7-alpine3.11
@@ -272,7 +257,7 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress')
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)  
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
@@ -288,7 +273,7 @@ jobs:
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       # Here's where you will add some code to rollback on failure      
                     
-  deploy-backend:
+  deploy_backend:
     docker:
       # Docker image here that supports Ansible
       - image: python:3.9.16
@@ -306,7 +291,7 @@ jobs:
             # your code here
       # Here's where you will add some code to rollback on failure  
 
-  smoke-test:
+  smoke_test:
     docker:
       # Lightweight Docker image 
       - image: python:3.7-alpine3.11
@@ -330,7 +315,7 @@ jobs:
             # your code here
       # Here's where you will add some code to rollback on failure  
 
-  cloudfront-update:
+  cloudfront_update:
     docker:
       # Docker image here that supports AWS CLI
       - image: cimg/aws:2023.01
@@ -368,46 +353,21 @@ cleanup:
 workflows:
   default:
     jobs:
-
-      - deploy-infrastructure
-      - configure-infrastructure 
-      - run-migrations
-      - deploy-frontend
-
-      # - build-backend
-      # - build-frontend
-      # - test_backend:
-      #     requires:
-      #       - build-backend
-      # - test_frontend:
-      #     requires:
-      #       - build-frontend
-      # - scan-backend:
-      #     requires:
-      #       - test_backend
-      # - scan-frontend:
-      #     requires:
-      #       - test_frontend
-      # - deploy_backend_infrastructure:
-      #     requires:
-      #       - scan_backend
-      #       - scan_frontend
-      #     filters:
-      #         branches:
-      #           only: [ master ]
-      # - deploy_frontend_infrastructure:
-      #     requires:
-      #       - scan_backend
-      #       - scan_frontend
-      #     filters:
-      #       branches:
-      #         only: [ master ]
-      # - run_db_migrations_for_backend:
-      #     requires:
-      #       - deploy_backend_infrastructure
-         
-      
-            
-  
-
-    
+      - build_backend
+      - build_frontend
+      - deploy_infrastructure:
+          requires:
+            - scan_backend
+            - scan_backend
+          filters:
+            branches:
+              only: [ master ]
+      - configure_infrastructure:
+          requires:
+            - deploy_infrastructure
+      - run_migrations:
+          requires:
+            - configure_infrastructure
+      - deploy_frontend:
+          requires:
+            - run_migrations

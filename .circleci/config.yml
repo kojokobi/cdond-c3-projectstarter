@@ -254,8 +254,8 @@ jobs:
 
   deploy-frontend:
     docker:
-      - image: cimg/aws:2023.01
-      # - image: python:3.7-alpine3.11
+      # - image: cimg/aws:2023.01
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
       - attach_workspace:

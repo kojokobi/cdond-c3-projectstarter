@@ -8,6 +8,9 @@ commands:
           command: |
             sudo apt update
             sudo apt install -y tar gzip curl software-properties-common
+            
+
+
       # - run:
       #     name: Installing aws-cli
       #     command: |
@@ -251,8 +254,8 @@ jobs:
 
   deploy-frontend:
     docker:
-      # - image: cimg/aws:2023.01
-      - image: python:3.7-alpine3.11
+      - image: cimg/aws:2023.01
+      # - image: python:3.7-alpine3.11
     steps:
       - checkout
       - attach_workspace:
@@ -260,15 +263,11 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-              apk add curl
-              apk add --upgrade bash
-              apk add --update ansible
-              apk add openssh-client
-              pip3 install awscli
-              
+              apk add --update tar gzip ansible nodejs npm curl
+              pip install awscli
 
-      - destroy-environment:
-          workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
+      # - destroy-environment:
+      #     workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
 
       - run:
           name: Get backend url

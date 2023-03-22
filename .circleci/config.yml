@@ -46,16 +46,15 @@ commands:
     steps:
       - run:
           name: Revert migrations
-          # Add when this will run
+          when: on_fail
           command: |
-            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = 1
+            SUCCESS=$(curl --insecure  https://kvdb.io/Dtvdyf99ArqNWh3EFf1rNi/migration_<< parameters.workflow_id >>)
+            
             if(( $SUCCESS==1 )); 
             then
-            #  cd ~/project/backend
-            #  npm install
-            #  Add revert code here. You can find this in the Getting Started section.
-              exit 1
+             cd ~/project/backend
+             npm install
+             npm run migration:revert
             fi
             
 jobs:
@@ -292,17 +291,32 @@ jobs:
       # Docker image here that supports Ansible
       - image: python:3.9.16
     steps:
-      # Checkout code from git
-      # Add ssh keys with fingerprint
-      # attach workspace
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["e8:8c:9d:22:3d:ac:9d:a4:a0:81:e7:cd:14:f8:06:48"]
+      - attach_workspace:
+          at: ~/
+      - restore_cache:
+          key: build_backend
       - run:
           name: Install dependencies
           command: |
-            # your code here
+            apk add --update tar gzip ansible nodejs npm curl openssh-client
+            pip install awscli
       - run:
           name: Deploy backend
           command: |
-            # your code here
+            cd backend
+            npm run build
+            tar -C backend -czvf artifact.tar.gz .
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
+            ansible-playbook -i inventory.txt deploy-backend.yml
+
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:17}
+      - revert-migrations
+
       # Here's where you will add some code to rollback on failure  
 
   smoke_test:
@@ -314,19 +328,35 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            # your code here
+            apk add --update tar gzip ansible nodejs npm curl openssh-client
+            pip install awscli
       - run:
           name: Get backend url
           command: |
-            # your code here
-      - run:
-          name: Backend smoke test.
-          command: |
-            # your code here
+             export API_URL="http://${BACKEND_IP}:3030"
+             echo "${API_URL}"
+             if curl "${API_URL}/api/status" | grep "ok"
+             then
+                eturn 0
+              else
+                return 1
+              fi
+      # - run:
+      #     name: Backend smoke test.
+      #     command: |
+      #       # your code here
       - run:
           name: Frontend smoke test.
           command: |
-            # your code here
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
+            echo ${URL} 
+            if curl -s ${URL} | grep "Welcome"
+            then
+              # Change this to 0 after the job fails
+              return 1
+            else
+              return 1
+            fi
       # Here's where you will add some code to rollback on failure  
 
   cloudfront_update:

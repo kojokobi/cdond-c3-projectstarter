@@ -129,22 +129,36 @@ jobs:
       - image: cimg/node:13.8.0
     steps:
       - checkout
-      - restore_cache:
-          keys: [frontend-scan]
+      # - restore_cache:
+      #     keys: [frontend-scan]
       - run:
           name: Scan frontend
           command: |
             cd frontend
             npm install
             npm audit fix --audit-level=critical --force
-
+  
+  analyze_backend:
+    docker:
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - run: npm audit --audit-level=critical --prefix backend
+  
+  analyze_frontend:
+    docker:
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - run: npm audit --audit-level=critical --prefix backend
+  
   scan_backend:
     docker:
       - image: cimg/node:13.8.0
     steps:
       - checkout
-      - restore_cache:
-          keys: [backend-scan]
+      # - restore_cache:
+      #     keys: [backend-scan]
       - run:
           name: scan backend
           command: |
@@ -357,8 +371,8 @@ workflows:
       - build_frontend
       - deploy_infrastructure:
           requires:
-            - scan_backend
-            - scan_backend
+            - analyze_frontend
+            - analyze_backend
             # need to finda solution to this
           filters:
             branches:

@@ -40,6 +40,9 @@ commands:
 
   revert_migrations:
     description: Revert the last migration if successfully run in the current workflow.
+    parameters:
+      workflow_id:
+        type: string
     steps:
       - run:
           name: Revert migrations
@@ -93,7 +96,6 @@ jobs:
 
   test_frontend:
     docker:
-      # Docker image here
       - image: cimg/node:13.8.0
     steps:
       - checkout
@@ -311,11 +313,9 @@ jobs:
             ansible-playbook -i inventory.txt deploy-backend.yml
 
       - destroy_environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:17}
-      - revert_migrations
-
-      # Here's where you will add some code to rollback on failure  
-
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert_migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
   
   smoke_test_backend:
     docker:

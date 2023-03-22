@@ -369,14 +369,14 @@ workflows:
     jobs:
       - build_backend
       - build_frontend
-      - deploy_infrastructure:
-          requires:
-            - analyze_frontend
-            - analyze_backend
-            # need to finda solution to this
-          filters:
-            branches:
-              only: [ master ]
+      - deploy_infrastructure
+          # requires:
+          #   - ana
+          #   - analyze_backend
+          #   # need to finda solution to this
+          # filters:
+          #   branches:
+          #     only: [ master ]
       - configure_infrastructure:
           requires:
             - deploy_infrastructure

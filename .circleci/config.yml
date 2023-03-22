@@ -188,7 +188,7 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy-environment:
+      - destroy_environment:
           workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
 
   configure_infrastructure:
@@ -359,6 +359,7 @@ workflows:
           requires:
             - scan_backend
             - scan_backend
+            # need to finda solution to this
           filters:
             branches:
               only: [ master ]

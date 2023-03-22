@@ -319,17 +319,19 @@ jobs:
 
       # Here's where you will add some code to rollback on failure  
 
-  smoke_test:
+  
+  smoke_test_backend:
     docker:
-      # Lightweight Docker image 
       - image: python:3.7-alpine3.11
     steps:
-      # Checkout code from git
+      - checkout
       - run:
           name: Install dependencies
           command: |
             apk add --update tar gzip ansible nodejs npm curl openssh-client
             pip install awscli
+      - attach_workspace:
+          at: ~/
       - run:
           name: Get backend url
           command: |
@@ -341,22 +343,31 @@ jobs:
               else
                 return 1
               fi
-      # - run:
-      #     name: Backend smoke test.
-      #     command: |
-      #       # your code here
+
+  smoke_test_frontend:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
       - run:
-          name: Frontend smoke test.
+          name: Install dependencies
           command: |
-            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
-            echo ${URL} 
-            if curl -s ${URL} | grep "Welcome"
-            then
-              # Change this to 0 after the job fails
-              return 1
-            else
-              return 1
-            fi
+              apk add --update tar gzip ansible nodejs npm curl openssh-client
+              pip install awscli
+      - attach_workspace:
+          at: ~/
+      - run:
+            name: Frontend smoke test.
+            command: |
+              URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
+              echo ${URL} 
+              if curl -s ${URL} | grep "Welcome"
+              then
+                # Change this to 0 after the job fails
+                return 1
+              else
+                return 1
+              fi
       # Here's where you will add some code to rollback on failure  
 
   cloudfront_update:
@@ -415,4 +426,13 @@ workflows:
             - configure_infrastructure
       - deploy_frontend:
           requires:
+            - deploy_infrastructure
+      - deploy_backend:
+          requires:
             - run_migrations
+      - smoke_test_frontend:
+          requires:
+            - deploy_frontend
+      - smoke_test_backend:
+          requires:
+            - deploy_backend

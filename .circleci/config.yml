@@ -349,25 +349,21 @@ jobs:
       - image: python:3.7-alpine3.11
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/
       - run:
           name: Install dependencies
           command: |
               apk add --update tar gzip ansible nodejs npm curl openssh-client
               pip install awscli
               
-      - attach_workspace:
-          at: ~/
       - run:
             name: Frontend smoke test.
             command: |
-              URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
-              echo ${URL} 
-              if curl -s ${URL} | grep "Welcome"
+              if curl -s  "http://udapeople-${CIRCLE_WORKFLOW_ID:0:17}.s3-website-us-east-1.amazonaws.com" | grep "Welcome"
               then
-                echo "In True"
                 return 0
               else
-                echo "In else"
                 return 1
               fi
        
@@ -472,7 +468,7 @@ workflows:
       - smoke_test_backend:
           requires:
             - deploy_backend
-      - cloudfront_update
+      # - cloudfront_update
           # requires:
           #   - smoke_test_frontend
           #   - smoke_test_backend

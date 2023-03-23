@@ -263,8 +263,7 @@ jobs:
               apk add --update tar gzip ansible nodejs npm curl
               pip install awscli
 
-      # - destroy-environment:
-      #     workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
+      
 
       - run:
           name: Get backend url
@@ -283,7 +282,12 @@ jobs:
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      # Here's where you will add some code to rollback on failure      
+            
+      # Here's where you will add some code to rollback on failure 
+      - destroy_environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert_migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
                     
   deploy_backend:
     docker:
@@ -350,6 +354,7 @@ jobs:
           command: |
               apk add --update tar gzip ansible nodejs npm curl openssh-client
               pip install awscli
+              
       - attach_workspace:
           at: ~/
       - run:
@@ -365,10 +370,10 @@ jobs:
                 return 1
               fi
        
-      - destroy_environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-      - revert_migrations:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      # - destroy_environment:
+      #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      # - revert_migrations:
+      #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   cloudfront_update:
     docker:
@@ -431,8 +436,8 @@ cleanup:
 
       - destroy_environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-      - revert_migrations:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      # - revert_migrations:
+      #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
             
 workflows:
   default:

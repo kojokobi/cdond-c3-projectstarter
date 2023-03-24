@@ -179,7 +179,7 @@ jobs:
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
               --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" \
-              --region us-east-1 \
+              --region us-east-1a \
               --tags project=udapeople       
       - run:
           name: Ensure front-end infrastructure exists
@@ -189,7 +189,7 @@ jobs:
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
               --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" \
-              --region us-east-1 \
+              --region us-east-1a \
               --tags project=udapeople           
       - run:
           name: Add back-end ip to ansible inventory
@@ -313,6 +313,7 @@ jobs:
             tar -C backend -czvf artifact.tar.gz .
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
+            cat 
             ansible-playbook -i inventory.txt deploy-backend.yml
 
       - destroy_environment:

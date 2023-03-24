@@ -179,7 +179,7 @@ jobs:
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
               --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" \
-              --region us-east-1a \
+              --region us-east-1 \
               --tags project=udapeople       
       - run:
           name: Ensure front-end infrastructure exists
@@ -189,7 +189,7 @@ jobs:
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
               --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" \
-              --region us-east-1a \
+              --region us-east-1 \
               --tags project=udapeople           
       - run:
           name: Add back-end ip to ansible inventory
@@ -464,6 +464,7 @@ workflows:
             - test_backend
             - scan_backend
             - scan_frontend
+            
       - configure_infrastructure:
           requires:
             - deploy_infrastructure

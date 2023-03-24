@@ -445,15 +445,24 @@ workflows:
     jobs:
       - build_backend
       - build_frontend
-      - deploy_infrastructure
-      
-          # requires:
-          #   - ana
-          #   - analyze_backend
-          #   # need to finda solution to this
-          # filters:
-          #   branches:
-          #     only: [ master ]
+      - test_backend:
+          requires:
+            - build_backend
+      - test_frontend:
+          requires:
+            - build_frontend
+      - scan_backend:
+          requires:
+            - build_backend
+      - scan_frontend:
+          requires:
+            - build_frontend
+      - deploy_infrastructure:
+          requires:
+            - test_frontend
+            - test_backend
+            - scan_backend
+            - scan_frontend
       - configure_infrastructure:
           requires:
             - deploy_infrastructure
@@ -462,7 +471,7 @@ workflows:
             - configure_infrastructure
       - deploy_frontend:
           requires:
-            - deploy_infrastructure
+            - run_migrations
       - deploy_backend:
           requires:
             - run_migrations
@@ -472,7 +481,7 @@ workflows:
       - smoke_test_backend:
           requires:
             - deploy_backend
-      # - cloudfront_update
-          # requires:
-          #   - smoke_test_frontend
-          #   - smoke_test_backend
+      - cloudfront_update:
+          requires:
+            - smoke_test_frontend
+            - smoke_test_backend

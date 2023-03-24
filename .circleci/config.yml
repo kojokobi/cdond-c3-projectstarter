@@ -366,7 +366,10 @@ jobs:
               else
                 return 1
               fi
-              for commit
+
+
+
+      # for commit
        
       # - destroy_environment:
       #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}

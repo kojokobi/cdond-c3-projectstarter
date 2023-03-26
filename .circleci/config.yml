@@ -353,6 +353,8 @@ jobs:
       - image: cimg/aws:2023.01
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/
       - run:
           name: Install dependencies
           command: |
@@ -386,6 +388,8 @@ cleanup:
     - image: cimg/aws:2023.01
   steps:
     - checkout
+    - attach_workspace:
+          at: ~/
     - run:
         name: Remove old stacks and files
         command: |
@@ -402,16 +406,6 @@ cleanup:
             aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
             aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
           fi
-
-    # - run:
-    #     name: Remove old stacks and files
-    #     command: |
-    #       if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
-    #       then
-    #         aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-    #         aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-    #         aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
-    #       fi
 
     # - destroy_environment:
     # - revert_migrations:

@@ -278,8 +278,8 @@ jobs:
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
 
-      - destroy_environment:
-      - revert_migrations:
+      # - destroy_environment:
+      # - revert_migrations:
 
   deploy_backend:
     docker:
@@ -308,8 +308,8 @@ jobs:
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
 
-      - destroy_environment:
-      - revert_migrations:
+      # - destroy_environment:
+      # - revert_migrations:
 
   smoke_test:
     docker:
@@ -345,8 +345,8 @@ jobs:
                return 1
             fi
 
-      - destroy_environment:
-      - revert_migrations:
+      # - destroy_environment:
+      # - revert_migrations:
 
   cloudfront_update:
     docker:
@@ -378,8 +378,8 @@ jobs:
             echo Old WorkFlow Id: "${OLD_WORKFLOW_ID}"
             echo Current Workflow Id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
-      - destroy-environment
-      - revert-migrations
+      # - destroy-environment
+      # - revert-migrations
 
 cleanup:
   docker:
@@ -413,8 +413,8 @@ cleanup:
     #         aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
     #       fi
 
-    - destroy_environment:
-    - revert_migrations:
+    # - destroy_environment:
+    # - revert_migrations:
 
 workflows:
   default:

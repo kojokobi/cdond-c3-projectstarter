@@ -415,7 +415,6 @@ workflows:
     jobs:
       - build_backend
       - build_frontend
-      - deploy_infrastructure
       - test_backend:
           requires:
             - build_backend

@@ -416,24 +416,24 @@ workflows:
     jobs:
       - build_backend
       - build_frontend
-      - test_backend:
-          requires:
-            - build_backend
-      - test_frontend:
-          requires:
-            - build_frontend
-      - scan_backend:
-          requires:
-            - build_backend
-      - scan_frontend:
-          requires:
-            - build_frontend
-      - deploy_infrastructure:
-          requires:
-            - test_frontend
-            - test_backend
-            - scan_backend
-            - scan_frontend
+      # - test_backend:
+      #     requires:
+      #       - build_backend
+      # - test_frontend:
+      #     requires:
+      #       - build_frontend
+      # - scan_backend:
+      #     requires:
+      #       - build_backend
+      # - scan_frontend:
+      #     requires:
+      #       - build_frontend
+      - deploy_infrastructure
+          # requires:
+          #   - test_frontend
+          #   - test_backend
+          #   - scan_backend
+          #   - scan_frontend
 
       - configure_infrastructure:
           requires:

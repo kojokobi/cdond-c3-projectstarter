@@ -213,7 +213,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Install dependencies
+          name: Install dependencies  
           command: |
             apk add curl
             apk add --upgrade bash
@@ -348,7 +348,7 @@ jobs:
 
       - destroy_environment
       - revert_migrations
-
+  # //trigger
   cloudfront_update:
     docker:
       - image: cimg/aws:2023.01

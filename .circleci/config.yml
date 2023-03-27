@@ -438,24 +438,24 @@ workflows:
       - configure_infrastructure:
           requires:
             - deploy_infrastructure
-      # - run_migrations:
-      #     requires:
-      #       - configure_infrastructure
-      # - deploy_frontend:
-      #     requires:
-      #       - run_migrations
-      # - deploy_backend:
-      #     requires:
-      #       - run_migrations
-      # - smoke_test:
-      #     requires:
-      #       - deploy_frontend
-      #       - deploy_backend
-      # - cloudfront_update:
-      #     requires:
-      #       - smoke_test
-      # - cleanup:
-      #     requires:
-      #       - cloudfront_update
+      - run_migrations:
+          requires:
+            - configure_infrastructure
+      - deploy_frontend:
+          requires:
+            - run_migrations
+      - deploy_backend:
+          requires:
+            - run_migrations
+      - smoke_test:
+          requires:
+            - deploy_frontend
+            - deploy_backend
+      - cloudfront_update:
+          requires:
+            - smoke_test
+      - cleanup:
+          requires:
+            - cloudfront_update
 
 # some trigger

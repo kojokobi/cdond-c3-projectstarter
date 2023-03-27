@@ -22,13 +22,14 @@
     TYPEORM_DATABASE: "{{ lookup('env','TYPEORM_DATABASE') }}"
     TYPEORM_PORT: "{{ lookup('env','TYPEORM_PORT') }}"
     TYPEORM_ENTITIES: "{{ lookup('env','TYPEORM_ENTITIES') }}"
-  roles:
+
+  tasks:
     # - deploy
     - name: Copy files
-    become: true
-    copy:
-      src: /root/project/artifact.tar.gz
-      dest: /home/ubuntu/artifact.tar.gz
+      become: true
+      copy:
+        src: /root/project/artifact.tar.gz
+        dest: /home/ubuntu/artifact.tar.gz
     - name: Unarchive
       become: true
       shell : |

@@ -311,6 +311,7 @@ jobs:
 
           # apk add --update tar gzip ansible nodejs npm pm2  curl openssh-client
           # pip install awscli
+          # Trigger
       - run:
           name: Deploy backend
           command: |

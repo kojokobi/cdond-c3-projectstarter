@@ -20,8 +20,8 @@
   - name: extract artifact
     become: true
     unarchive:
-    src: files/artifact.tar.gz
-    dest: .
+      src: files/artifact.tar.gz
+      dest: .
     
   - name: start app
     become: true

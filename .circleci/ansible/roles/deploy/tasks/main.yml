@@ -1,34 +1,21 @@
 ---
-  # - name: Copy files
-  #   become: true
-  #   copy:
-  #     src: /root/project/artifact.tar.gz
-  #     dest: /home/ubuntu/artifact.tar.gz
-  # - name: Unarchive
-  #   become: true
-  #   shell : |
-  #       cd /home/ubuntu/
-  #       tar xvzf artifact.tar.gz -C .
-  # - name: "run server"
-  #   become: true
-  #   shell : |
-  #       cd /home/ubuntu/
-  #       npm install
-  #       pm2 stop default
-  #       pm2 start npm -- start
-
-  - name: extract artifact
+  - name: Copy files
     become: true
-    unarchive:
-      src: files/artifact.tar.gz
-      dest: .
-    
-  - name: start app
+    copy:
+      src: /root/project/artifact.tar.gz
+      dest: /home/ubuntu/artifact.tar.gz
+  - name: Unarchive
     become: true
-    shell: |
-      npm install
-      pm2 stop all
-      pm2 start npm --name "udapeople-backend" -- run start
+    shell : |
+        cd /home/ubuntu/
+        tar xvzf artifact.tar.gz -C .
+  - name: "run server"
+    become: true
+    shell : |
+        cd /home/ubuntu/
+        npm install
+        pm2 stop default
+        pm2 start npm -- start
     environment:
       ENVIRONMENT: production
       TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
@@ -40,14 +27,3 @@
       TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
       TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
       TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
-
-  - name: "Set pm2 start as service"
-    become: true
-    shell: |
-      env PATH=$PATH:/usr/local/bin pm2 startup -u ubuntu
-  - name: check pm2 status
-    become: true
-    shell: |
-      pm2 describe "udapeople-backend"
-    register: command_output_npm
-  - debug: var=command_output_npm.stdout_lines

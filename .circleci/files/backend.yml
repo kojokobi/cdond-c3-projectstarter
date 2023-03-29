@@ -28,10 +28,8 @@ Resources:
     Properties:
       InstanceType: t2.micro
       AvailabilityZone: us-east-1a
-      SecurityGroups: 
-          # - sg-0c09c2823c4faf349 
-          #Custom security group i created
-        - !Ref InstanceSecurityGroup
+      SecurityGroups:
+        - Ref: InstanceSecurityGroup
       KeyName: udacity # If you use another key pair name, you should change this value to match.
       # If this ami id is not available for you, you can find another (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html)
       # Ubuntu 18 or higher works fine

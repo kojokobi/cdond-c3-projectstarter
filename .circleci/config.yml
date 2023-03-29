@@ -328,7 +328,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update tar gzip ansible nodejs npm curl openssh-client
+            apk add --update curl
             pip install awscli
       - run:
           name: Backend smoke test
@@ -336,7 +336,7 @@ jobs:
             export BACKEND_IP_ADD=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
             export API_URL="http://${BACKEND_IP_ADD}:3030"
             echo "${API_URL}"
-            if curl "${API_URL}/api/status" | grep "ok"
+            if curl ${API_URL}/api/status | grep "ok"
             then
               return 0
             else

@@ -312,11 +312,7 @@ jobs:
             tar -C backend -czvf artifact.tar.gz .
             cd .circleci/ansible
             ansible-playbook -i inventory.txt deploy-backend.yml
-
-
-          # tar -C backend -czvf backend_artifact.tar.gz . && \
-          # cd .circleci/ansible && \
-          # ansible-playbook -i inventory.txt deploy-backend.yml
+          
 
       - destroy_environment
       - revert_migrations

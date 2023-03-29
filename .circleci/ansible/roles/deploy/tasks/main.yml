@@ -1,14 +1,45 @@
 ---
+  - name: "update apt packages."
+    apt:
+      update_cache: yes
+
+  - name: "upgrade packages"
+    apt:
+      upgrade: yes
+
+  - name: remove dependencies that are no longer required
+    apt:
+      autoremove: yes
+
+  - name: install node
+    shell: |
+      curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash - && sudo apt-get install -y nodejs
+
+  - name: "Install zip utility."
+    apt:
+      name: [ "zip", "unzip" ]
+      state: latest
+      update_cache: yes
+
+  - name: "install pm2"
+    npm:
+      name: pm2
+      global: yes
+      production: yes
+      state: present
+
   - name: Copy files
     become: true
     copy:
       src: /root/project/artifact.tar.gz
       dest: /home/ubuntu/artifact.tar.gz
+
   - name: Unarchive
     become: true
     shell : |
         cd /home/ubuntu/
         tar xvzf artifact.tar.gz -C .
+        
   - name: "run server"
     become: true
     shell : |

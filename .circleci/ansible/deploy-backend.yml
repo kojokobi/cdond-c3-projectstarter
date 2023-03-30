@@ -25,6 +25,7 @@
     TYPEORM_ENTITIES: "{{ lookup('env','TYPEORM_ENTITIES') }}"
 
   roles:
+    - setup
     - deploy
     # - name: Copy files
     #   become: true

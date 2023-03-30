@@ -1,52 +1,45 @@
 ---
-  - name: "update apt packages."
-    apt:
-      update_cache: yes
-
-  - name: "upgrade packages"
-    apt:
-      upgrade: yes
-
-  - name: remove dependencies that are no longer required
-    apt:
-      autoremove: yes
-
-  - name: install node
-    shell: |
-      curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash - && sudo apt-get install -y nodejs
-
-  - name: "Install zip utility."
-    apt:
-      name: [ "zip", "unzip" ]
-      state: latest
-      update_cache: yes
-
-  - name: "install pm2"
-    npm:
-      name: pm2
-      global: yes
-      production: yes
-      state: present
+  - name: "make a new directory"
+    file:
+      path: ~/backend
+      state: directory
 
   - name: Copy files
     become: true
     copy:
       src: /root/project/artifact.tar.gz
-      dest: /home/ubuntu/artifact.tar.gz
+      # dest: /home/ubuntu/artifact.tar.gz
+      dest: ~/backend/artifact.tar.gz
+  - name: move built artifact
+    become: true
+    copy:
+
+  
 
   - name: Unarchive
     become: true
     shell : |
-        cd /home/ubuntu/
-        tar xvzf artifact.tar.gz -C .
+      cd ~/backend
+      tar xvzf artifact.tar.gz -C .
+
+  - name: do npm install
+    shell: |
+      cd ~/backend
+      npm install
         
   - name: "run server"
     become: true
     shell : |
-        cd /home/ubuntu/
+        export
+        cd ~/backend
+        pm2 start main.js
         npm install
-        pm2 stop default
-        pm2 start npm -- start
+    register: execute_node
+        
+      # pm2 start npm --name "udapeople-backend" -- run start
+      # pm2 stop default
+      # pm2 start npm -- start
+
     environment:
       ENVIRONMENT: production
       TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
@@ -58,3 +51,19 @@
       TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
       TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
       TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
+
+  - name: print message
+    debug:
+    msg: "{{ execute_node.stdout_lines }}"
+
+  - name: "set pm2 to start as a service"
+    become: true
+    shell: | 
+      env PATH=$PATH:/usr/local/bin pm2 startup -u ubuntu
+
+  - name: check pm2 status
+    become: true
+    shell: |
+      pm2 describe "udapeople-backend"
+    register: command_output_npm
+  - debug: var=command_output_npm.stdout_lines

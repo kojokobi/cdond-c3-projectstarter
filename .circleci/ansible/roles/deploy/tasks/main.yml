@@ -58,14 +58,16 @@
     TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
     TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
     TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
-# - name: "set pm2 to start as a service"
-#   become: true
-#   shell: |
-#     env PATH=$PATH:/usr/local/bin pm2 startup -u ubuntu
 
-# - name: check pm2 status
-#   become: yes
-#   shell: |
-#     pm2 describe "udapeople-backend"
-#   register: command_output_npm
-# - debug: var=command_output_npm.stdout_lines
+
+- name: "set pm2 to start as a service"
+  become: true
+  shell: |
+    env PATH=$PATH:/usr/local/bin pm2 startup -u ubuntu
+
+- name: check pm2 status
+  become: true
+  shell: |
+    pm2 describe "udapeople-backend"
+  register: command_output_npm
+- debug: var=command_output_npm.stdout_lines

@@ -49,11 +49,12 @@
     pm2 start npm --name "udapeople-backend" -- run start
   # pm2 start npm -- start
   environment:
+    NODE_ENV: production
     ENVIRONMENT: production
     TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
-    TYPEORM_MIGRATIONS_DIR: "./src/migrations"
-    TYPEORM_MIGRATIONS: "./src/migrations/*.js"
-    TYPEORM_ENTITIES: "./src/modules/domain/**/*.entity.js"
+    TYPEORM_MIGRATIONS_DIR: "./dist/migrations"
+    TYPEORM_MIGRATIONS: "./dist/migrations/*.js"
+    TYPEORM_ENTITIES: "./dist/modules/domain/**/*.entity.js"
     TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
     TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
     TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"

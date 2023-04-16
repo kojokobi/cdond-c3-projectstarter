@@ -1,79 +1,102 @@
----
-- name: "update apt packages."
-  apt:
-    update_cache: yes
-
-- name: "upgrade packages"
-  apt:
-    upgrade: yes
-
-- name: remove dependencies that are no longer required
-  apt:
-    autoremove: yes
-
-- name: install node
-  shell: |
-    curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash - && sudo apt-get install -y nodejs
-
-- name: "Install zip utility."
-  apt:
-    name: ["zip", "unzip"]
-    state: latest
-    update_cache: yes
-
-- name: "install pm2"
-  npm:
-    name: pm2
-    global: yes
-    production: yes
-    state: present
-
-- name: Copy files
+- name: create directory 
   become: true
-  copy:
-    src: /root/project/artifact.tar.gz
-    dest: /home/ubuntu/artifact.tar.gz
-
-- name: Unarchive
+  file: 
+    path: /home/ubuntu/web
+    state: directory
+    mode: 0755
+- name: copy artifact
+  become: true
+  copy: 
+    src: ~/project/artifact.tar.gz
+    dest: /home/ubuntu/web/artifact.tar.gz
+- name: Extract artifact files
   become: true
   shell: |
-    cd /home/ubuntu/
-    tar xvzf artifact.tar.gz -C .
-
-- name: "run server"
+    cd /home/ubuntu/web
+    tar -xvf artifact.tar.gz
+- name: Executing node
   become: true
   shell: |
-    cd /home/ubuntu/
-    npm install
+    cd /home/ubuntu/web
     pm2 stop default
-    pm2 start npm --name "udapeople-backend" -- run start
-  # pm2 start npm -- start
-  environment:
-    NODE_ENV: production
-    ENVIRONMENT: production
-    TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
-    TYPEORM_MIGRATIONS_DIR: "./dist/migrations"
-    TYPEORM_MIGRATIONS: "./dist/migrations/*.js"
-    TYPEORM_ENTITIES: "./dist/modules/domain/**/*.entity.js"
-    TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
-    TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
-    TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
-    TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
-    TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
+    pm2 start npm -- start
+
+# ---
+# - name: "update apt packages."
+#   apt:
+#     update_cache: yes
+
+# - name: "upgrade packages"
+#   apt:
+#     upgrade: yes
+
+# - name: remove dependencies that are no longer required
+#   apt:
+#     autoremove: yes
+
+# - name: install node
+#   shell: |
+#     curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash - && sudo apt-get install -y nodejs
+
+# - name: "Install zip utility."
+#   apt:
+#     name: ["zip", "unzip"]
+#     state: latest
+#     update_cache: yes
+
+# - name: "install pm2"
+#   npm:
+#     name: pm2
+#     global: yes
+#     production: yes
+#     state: present
+
+# - name: Copy files
+#   become: true
+#   copy:
+#     src: /root/project/artifact.tar.gz
+#     dest: /home/ubuntu/artifact.tar.gz
+
+# - name: Unarchive
+#   become: true
+#   shell: |
+#     cd /home/ubuntu/
+#     tar xvzf artifact.tar.gz -C .
+
+# - name: "run server"
+#   become: true
+#   shell: |
+#     cd /home/ubuntu/
+#     npm install
+#     pm2 stop default
+#     pm2 start npm --name "udapeople-backend" -- run start
+#   # pm2 start npm -- start
+#   environment:
+#     NODE_ENV: production
+#     ENVIRONMENT: production
+#     TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
+#     TYPEORM_MIGRATIONS_DIR: "./dist/migrations"
+#     TYPEORM_MIGRATIONS: "./dist/migrations/*.js"
+#     TYPEORM_ENTITIES: "./dist/modules/domain/**/*.entity.js"
+#     TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
+#     TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
+#     TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
+#     TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
+#     TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
 
 
-- name: "set pm2 to start as a service"
-  become: true
-  shell: |
-    env PATH=$PATH:/usr/local/bin pm2 startup -u ubuntu
+# - name: "set pm2 to start as a service"
+#   become: true
+#   shell: |
+#     env PATH=$PATH:/usr/local/bin pm2 startup -u ubuntu
 
-- name: check pm2 status
-  become: true
-  shell: |
-    pm2 describe "udapeople-backend"
-  register: command_output_npm
-- debug: var=command_output_npm.stdout_lines
+# - name: check pm2 status
+#   become: true
+#   shell: |
+#     pm2 describe "udapeople-backend"
+#   register: command_output_npm
+# - debug: var=command_output_npm.stdout_lines
 
 
-# just a trigger
-# just a trigger
+# # just a trigger
+# # just a trigger

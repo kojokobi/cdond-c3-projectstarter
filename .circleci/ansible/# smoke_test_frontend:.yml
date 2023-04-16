@@ -94,4 +94,5 @@
 
             # export BACKEND_IP_WITH_UBUNTU_USER=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
             # "ubuntu@${BACKEND_IP_WITH_UBUNTU_USER}" >> .circleci/ansible/inventory.txt
+            # TYPEORM_HOST
             

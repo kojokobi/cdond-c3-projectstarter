@@ -38,7 +38,7 @@
     # TYPEORM_ENTITIES: "./dist/modules/domain/**/*.entity.js"
 
   roles:
-    - setup
+    - configure-server
     - deploy
     # - name: Copy files
     #   become: true

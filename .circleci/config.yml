@@ -28,7 +28,6 @@ commands:
           name: Create backend .env
           command: |
             echo -e "NODE_ENV=local\nVERSION=1\nTYPEORM_CONNECTION=${TYPEORM_CONNECTION}\nTYPEORM_MIGRATIONS_DIR=${TYPEORM_MIGRATIONS_DIR}\nTYPEORM_ENTITIES=${TYPEORM_ENTITIES}\nTYPEORM_MIGRATIONS=${TYPEORM_MIGRATIONS}\nTYPEORM_HOST=${TYPEORM_HOST}\nTYPEORM_PORT=${TYPEORM_PORT}\nTYPEORM_USERNAME=${TYPEORM_USERNAME}\nTYPEORM_PASSWORD=${TYPEORM_PASSWORD}\nTYPEORM_DATABASE=${TYPEORM_DATABASE}" >> backend/.env    
-      
 
   destroy_environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -146,20 +145,6 @@ jobs:
             npm install
             npm audit fix --audit-level=critical --force
 
-  analyze_backend:
-    docker:
-      - image: cimg/node:13.8.0
-    steps:
-      - checkout
-      - run: npm audit --audit-level=critical --prefix backend
-
-  analyze_frontend:
-    docker:
-      - image: cimg/node:13.8.0
-    steps:
-      - checkout
-      - run: npm audit --audit-level=critical --prefix backend
-
   scan_backend:
     docker:
       - image: cimg/node:13.8.0
@@ -208,6 +193,8 @@ jobs:
             cat .circleci/ansible/inventory.txt
       
       - ensure-backend-env-exists
+
+      
 
       - persist_to_workspace:
           root: ~/
@@ -364,8 +351,8 @@ jobs:
                return 1
             fi
 
-      # - destroy_environment
-      # - revert_migrations
+      - destroy_environment
+      - revert_migrations
   
   cloudfront_update:
     docker:
@@ -442,26 +429,24 @@ workflows:
     jobs:
       - build_backend
       - build_frontend
-      # - test_backend:
-      #     requires:
-      #       - build_backend
-      # - test_frontend:
-      #     requires:
-      #       - build_frontend
-      # - scan_backend:
-      #     requires:
-      #       - build_backend
-      # - scan_frontend:
-      #     requires:
-      #       - build_frontend
-      - deploy_infrastructure
-          # requires:
-          #   - test_frontend
-          #   - test_backend
-          #   - scan_backend
-          #   - scan_frontend
-          # here
-
+      - test_backend:
+          requires:
+            - build_backend
+      - test_frontend:
+          requires:
+            - build_frontend
+      - scan_backend:
+          requires:
+            - build_backend
+      - scan_frontend:
+          requires:
+            - build_frontend
+      - deploy_infrastructure:
+          requires:
+            - test_frontend
+            - test_backend
+            - scan_backend
+            - scan_frontend
       - configure_infrastructure:
           requires:
             - deploy_infrastructure
@@ -484,5 +469,3 @@ workflows:
       - cleanup:
           requires:
             - cloudfront_update
-
-# some trigger

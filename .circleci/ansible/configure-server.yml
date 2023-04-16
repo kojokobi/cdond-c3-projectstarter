@@ -44,4 +44,3 @@
   roles:
     - configure-server
     - configure-prometheus-node-exporter
-      become: true

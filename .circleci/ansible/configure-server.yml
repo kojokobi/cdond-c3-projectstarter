@@ -44,3 +44,5 @@
   roles:
     - configure-server
     - configure-prometheus-node-exporter
+
+    # some trigger

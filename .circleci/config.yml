@@ -469,4 +469,3 @@ workflows:
       - cleanup:
           requires:
             - cloudfront_update
-# just a trigger

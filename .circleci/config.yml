@@ -8,13 +8,6 @@ commands:
           command: |
             sudo apt update
             sudo apt install -y tar gzip curl software-properties-common
-
-      # - run:
-      #     name: Installing aws-cli
-      #     command: |
-      #       curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-      #       unzip awscliv2.zip
-      #       sudo ./aws/install
       - run:
           name: Installing ansible
           command: |
@@ -427,48 +420,101 @@ jobs:
 workflows:
   default:
     jobs:
-      - build_backend
-      - build_frontend
-      # - test_backend:
-      #     requires:
-      #       - build_backend
-      # - test_frontend:
-      #     requires:
-      #       - build_frontend
-      # - scan_backend:
-      #     requires:
-      #       - build_backend
-      # - scan_frontend:
-      #     requires:
-      #       - build_frontend
-      - deploy_infrastructure
-          # requires:
-          #   - test_frontend
-          #   - test_backend
-          #   - scan_backend
-          #   - scan_frontend
+      - build_backend:
+          filters:
+            branches:
+              only:
+                - dev
+      - build_frontend:
+          filters:
+            branches:
+              only:
+                - dev
+      - test_backend:
+          requires:
+            - build_backend
+          filters:
+            branches:
+              only:
+                - dev
+      - test_frontend:
+          requires:
+            - build_frontend
+          filters:
+            branches:
+              only:
+                - dev
+      - scan_backend:
+          requires:
+            - build_backend
+          filters:
+            branches:
+              only:
+                - dev
+      - scan_frontend:
+          requires:
+            - build_frontend
+          filters:
+            branches:
+              only:
+                - dev
+      - deploy_infrastructure:
+          requires:
+            - test_frontend
+            - test_backend
+            - scan_backend
+            - scan_frontend
+          filters:
+            branches:
+              only:
+                - main
       - configure_infrastructure:
           requires:
             - deploy_infrastructure
+          filters:
+            branches:
+              only:
+                - main
       - run_migrations:
           requires:
             - configure_infrastructure
+          filters:
+            branches:
+              only:
+                - main
       - deploy_frontend:
           requires:
             - run_migrations
+          filters:
+            branches:
+              only:
+                - main
       - deploy_backend:
           requires:
             - run_migrations
+          filters:
+            branches:
+              only:
+                - main
       - smoke_test:
           requires:
             - deploy_frontend
             - deploy_backend
+          filters:
+            branches:
+              only:
+                - main
       - cloudfront_update:
           requires:
             - smoke_test
+          filters:
+            branches:
+              only:
+                - main
       - cleanup:
           requires:
             - cloudfront_update
-
-
-# jst a trigger//
+          filters:
+            branches:
+              only:
+                - main

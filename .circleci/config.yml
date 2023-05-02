@@ -420,101 +420,46 @@ jobs:
 workflows:
   default:
     jobs:
-      - build_backend:
-          filters:
-            branches:
-              only:
-                - dev
-      - build_frontend:
-          filters:
-            branches:
-              only:
-                - dev
+      - build_backend
+      - build_frontend
       - test_backend:
           requires:
             - build_backend
-          filters:
-            branches:
-              only:
-                - dev
       - test_frontend:
           requires:
             - build_frontend
-          filters:
-            branches:
-              only:
-                - dev
       - scan_backend:
           requires:
             - build_backend
-          filters:
-            branches:
-              only:
-                - dev
       - scan_frontend:
           requires:
             - build_frontend
-          filters:
-            branches:
-              only:
-                - dev
-      - deploy_infrastructure:
+      - deploy_infrastructure
           # requires:
           #   - test_frontend
           #   - test_backend
           #   - scan_backend
           #   - scan_frontend
-          filters:
-            branches:
-              only:
-                - main
       - configure_infrastructure:
           requires:
             - deploy_infrastructure
-          filters:
-            branches:
-              only:
-                - main
       - run_migrations:
           requires:
             - configure_infrastructure
-          filters:
-            branches:
-              only:
-                - main
       - deploy_frontend:
           requires:
             - run_migrations
-          filters:
-            branches:
-              only:
-                - main
       - deploy_backend:
           requires:
             - run_migrations
-          filters:
-            branches:
-              only:
-                - main
       - smoke_test:
           requires:
             - deploy_frontend
             - deploy_backend
-          filters:
-            branches:
-              only:
-                - main
       - cloudfront_update:
           requires:
             - smoke_test
-          filters:
-            branches:
-              only:
-                - main
       - cleanup:
           requires:
             - cloudfront_update
-          filters:
-            branches:
-              only:
-                - main
+          

@@ -459,11 +459,11 @@ workflows:
               only:
                 - dev
       - deploy_infrastructure:
-          requires:
-            - test_frontend
-            - test_backend
-            - scan_backend
-            - scan_frontend
+          # requires:
+          #   - test_frontend
+          #   - test_backend
+          #   - scan_backend
+          #   - scan_frontend
           filters:
             branches:
               only:

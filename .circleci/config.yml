@@ -409,9 +409,16 @@ jobs:
                         --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
               echo Stack names: "${STACKS[@]}"  
 
+               if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "udapeople-${OldWorkflowID}" ]]
+               then 
+                    echo "-------------Correct condition-------------------"
+                else
+                    echo "--------------Wrong Condition---------------------"
+               fi
              
               # if [[ "${OldWorkflowID}" =~ "${STACKS[@]}"  ]]
-               if printf '%s\n' "${STACKS[@]}" | grep -q "$OldWorkflowID";
+              #  if printf '%s\n' "${STACKS[@]}" | grep -q "$OldWorkflowID";
+               if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
               then
                     echo "-------------Delete Confirmed-------------------"
                     aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
@@ -419,6 +426,7 @@ jobs:
                     aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
               else
                     echo "--------------Cannot Cleanup---------------------"
+                    
               fi
 
 

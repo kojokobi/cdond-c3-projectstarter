@@ -361,25 +361,29 @@ jobs:
           command: |
             # your code here
       - run:
-          name: Save Old Worldflow Id to file
+          name: Save Old Worldflow Id
           command: |
               export OldWorkflowID=$(aws cloudformation \
               list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
               --no-paginate --output text)
 
-              echo OldWorkFlowId: "${OldWorkflowID}"
-              echo $OldWorkflowID >> ~/OldWorkflowID.txt
-              cat ~/OldWorkflowID.txt
+              echo OldWokflowID: "$OldWorkflowID"
+              curl https://kvdb.io/Dtvdyf99ArqNWh3EFf1rNi/old_workflow_id -d "${OldWorkflowID}"
+
 
               aws cloudformation deploy \
               --template-file .circleci/files/cloudfront.yml \
-              --stack-name "InitialStack" \
+              --stack-name  InitialStack \
               --region us-east-1 \
               --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
               --tags project=udapeople
 
               echo OldWorkflowId: "${OldWorkflowID}"
               echo Current WorkflowId: "${CIRCLE_WORKFLOW_ID:0:7}"
+      # - run :
+      #     name: Cloudfront update
+      #     command: |
+      #       aws cloudfront create-invalidation --distribution-id ${DISTRIBUTION_ID} --paths "/*"
 
       - destroy_environment
       - revert_migrations
@@ -396,11 +400,8 @@ jobs:
           command: |
               
               # Fetch the Old workflow ID
-              export OldWorkflowID=$(aws cloudformation \
-              list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
-              --no-paginate --output text)
-
-              echo OldWorkflowID: "${OldWorkflowID}"
+              export OldWorkflowID=$(curl --insecure https://kvdb.io/Dtvdyf99ArqNWh3EFf1rNi/old_workflow_id)
+              echo "Old Wokflow ID: $OldWorkflowID"
               echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
 
               # Fetch the stack names          
@@ -408,10 +409,8 @@ jobs:
                         --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
               echo Stack names: "${STACKS[@]}"  
 
-              # You can use any condition like:
-              ## if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
-              ## if [[ "${OldWorkflowID}" =~ "${STACKS[@]}"  ]]
-              if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
+             
+              if [[ "${OldWorkflowID}" =~ "${STACKS[@]}"  ]]
               then
                     echo "-------------Delete Confirmed-------------------"
                     aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive

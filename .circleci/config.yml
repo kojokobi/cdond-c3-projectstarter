@@ -400,7 +400,7 @@ jobs:
           command: |
               
               # Fetch the Old workflow ID
-              export OldWorkflowID=$(curl --insecure https://kvdb.io/Dtvdyf99ArqNWh3EFf1rNi/old_workflow_id)
+              export OldWorkflowID=$(curl --insecure https://kvdb.io/32huAaHdSpQL9ECfBWzFCL/old_workflow_id)
               echo "Old Wokflow ID: $OldWorkflowID"
               echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
 

@@ -55,7 +55,7 @@ commands:
             echo $SUCCESS
             if(( $SUCCESS==1 )); 
             then
-             cd ~/project/backend
+             cd ~/circleci/project/backend
              npm install
              npm run migration:revert
             else
@@ -244,7 +244,7 @@ jobs:
       - run:
           name: Send migration results to kvdb.io
           command: |
-            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+            if grep -q "has been executed successfully." ~/circleci/project/backend/migrations_dump.txt
             then
                   curl https://kvdb.io/32huAaHdSpQL9ECfBWzFCL/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             else

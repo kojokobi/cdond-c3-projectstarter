@@ -52,11 +52,14 @@ commands:
           command: |
             SUCCESS=$(curl --insecure  https://kvdb.io/32huAaHdSpQL9ECfBWzFCL/migration_<< parameters.workflow_id >>)
 
-            if(( $SUCCESS==1 ));
+            echo $SUCCESS
+            if(( $SUCCESS==1 )); 
             then
              cd ~/project/backend
              npm install
              npm run migration:revert
+            else
+                echo "No migrations to revert"
             fi
   
 
@@ -341,7 +344,7 @@ jobs:
           command: |
             if curl -s  "http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com" | grep "Welcome"
             then
-               return 0
+               return 1
             else
                return 1
             fi

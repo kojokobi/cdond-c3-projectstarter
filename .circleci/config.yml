@@ -217,7 +217,7 @@ jobs:
       
       - destroy_environment
 
-  
+
 
   run_migrations:
     docker:
@@ -312,6 +312,22 @@ jobs:
       - destroy_environment
       - revert_migrations
 
+  test_revert_migrations:
+    docker:
+      # - image: cimg/aws:2023.01
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update curl
+            pip install awscli
+      
+      - revert_migrations
+  
   smoke_test:
     docker:
       # - image: cimg/aws:2023.01
@@ -431,38 +447,39 @@ jobs:
 workflows:
   default:
     jobs:
-      - build_backend
-      - build_frontend
-      # - test_backend:
+      - test_revert_migrations
+      # - build_backend
+      # - build_frontend
+      # # - test_backend:
+      # #     requires:
+      # #       - build_backend
+      # # - test_frontend:
+      # #     requires:
+      # #       - build_frontend
+      # # - scan_backend:
+      # #     requires:
+      # #       - build_backend
+      # # - scan_frontend:
+      # #     requires:
+      # #       - build_frontend
+      # - deploy_infrastructure
+      #     # requires:
+      #     #   - test_frontend
+      #     #   - test_backend
+      #     #   - scan_backend
+      #     #   - scan_frontend
+      # - configure_infrastructure:
       #     requires:
-      #       - build_backend
-      # - test_frontend:
+      #       - deploy_infrastructure
+      # - run_migrations:
       #     requires:
-      #       - build_frontend
-      # - scan_backend:
+      #       - configure_infrastructure
+      # - deploy_frontend:
       #     requires:
-      #       - build_backend
-      # - scan_frontend:
+      #       - run_migrations
+      # - deploy_backend:
       #     requires:
-      #       - build_frontend
-      - deploy_infrastructure
-          # requires:
-          #   - test_frontend
-          #   - test_backend
-          #   - scan_backend
-          #   - scan_frontend
-      - configure_infrastructure:
-          requires:
-            - deploy_infrastructure
-      - run_migrations:
-          requires:
-            - configure_infrastructure
-      - deploy_frontend:
-          requires:
-            - run_migrations
-      - deploy_backend:
-          requires:
-            - run_migrations
+      #       - run_migrations
       # - smoke_test:
       #     requires:
       #       - deploy_frontend

@@ -321,12 +321,17 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: Install dependencies
+          name: Revert migrations
+          when: on_fail
           command: |
-            apk add --update curl
-            pip install awscli
+            cd ~/project/backend
+            npm install
+            npm run migration:revert
+  
+
       
-      - revert_migrations
+      
+      # - revert_migrations
   
   smoke_test:
     docker:

@@ -52,7 +52,7 @@ commands:
           command: |
             cd ~/project/backend
             npm install
-            npm run migration:revert
+            npm run migrations:revert
   
 
 jobs:
@@ -335,7 +335,8 @@ jobs:
   smoke_test:
     docker:
       # - image: cimg/aws:2023.01
-      - image: python:3.7-alpine3.11
+      # - image: python:3.7-alpine3.11
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - attach_workspace:
@@ -343,8 +344,9 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update curl
-            pip install awscli
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
       - run:
           name: Backend smoke test
           command: |
@@ -451,43 +453,43 @@ jobs:
 workflows:
   default:
     jobs:
-      - test_revert_migrations
-      # - build_backend
-      # - build_frontend
-      # # - test_backend:
-      # #     requires:
-      # #       - build_backend
-      # # - test_frontend:
-      # #     requires:
-      # #       - build_frontend
-      # # - scan_backend:
-      # #     requires:
-      # #       - build_backend
-      # # - scan_frontend:
-      # #     requires:
-      # #       - build_frontend
-      # - deploy_infrastructure
-      #     # requires:
-      #     #   - test_frontend
-      #     #   - test_backend
-      #     #   - scan_backend
-      #     #   - scan_frontend
-      # - configure_infrastructure:
+      # - test_revert_migrations
+      - build_backend
+      - build_frontend
+      # - test_backend:
       #     requires:
-      #       - deploy_infrastructure
-      # - run_migrations:
+      #       - build_backend
+      # - test_frontend:
       #     requires:
-      #       - configure_infrastructure
-      # - deploy_frontend:
+      #       - build_frontend
+      # - scan_backend:
       #     requires:
-      #       - run_migrations
-      # - deploy_backend:
+      #       - build_backend
+      # - scan_frontend:
       #     requires:
-      #       - run_migrations
-      # - smoke_test:
-      #     requires:
-      #       - deploy_frontend
-      #       - deploy_backend
+      #       - build_frontend
+      - deploy_infrastructure
+          # requires:
+          #   - test_frontend
+          #   - test_backend
+          #   - scan_backend
+          #   - scan_frontend
+      - configure_infrastructure:
+          requires:
+            - deploy_infrastructure
+      - run_migrations:
+          requires:
+            - configure_infrastructure
+      - deploy_frontend:
+          requires:
+            - run_migrations
+      - deploy_backend:
+          requires:
+            - run_migrations
+      - smoke_test:
+          requires:
+            - deploy_frontend
+            - deploy_backend
       # - cloudfront_update:
       #     requires:
       #       - smoke_test

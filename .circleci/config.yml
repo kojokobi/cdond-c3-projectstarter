@@ -51,9 +51,8 @@ commands:
           when: on_fail
           command: |
             SUCCESS=$(curl --insecure  https://kvdb.io/32huAaHdSpQL9ECfBWzFCL/migration_<< parameters.workflow_id >>)
-            echo $SUCCESS
 
-            if(( $SUCCESS==1 ));
+            if (( $SUCCESS == 1 ));
             then
              cd ~/project/backend
              npm install
@@ -61,8 +60,6 @@ commands:
             else
                 echo "No migrations to revert"
             fi
-
-  
 
 jobs:
   build_frontend:
@@ -327,12 +324,26 @@ jobs:
       
       
       # - revert_migrations
+  test_revert_migrations:
+    docker:
+      # - image: cimg/aws:2023.01
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Revert migrations
+          command: |
+            cd ~/project/backend
+            npm install
+            npm run migrations:revert
   
   smoke_test:
     docker:
       # - image: cimg/aws:2023.01
-      - image: python:3.7-alpine3.11
-      # - image: cimg/node:13.8.0
+      # - image: python:3.7-alpine3.11
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - attach_workspace:
@@ -340,8 +351,9 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update curl
-            pip install awscli
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
 
       - run:
           name: Backend smoke test
@@ -351,18 +363,18 @@ jobs:
             echo "${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
             then
-              return 0
+              exit 0
             else
-              return 1
+              exit 1
             fi
       - run:
           name: Frontend smoke test
           command: |
             if curl -s  "http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com" | grep "Welcome"
             then
-               return 1
+               exit 1
             else
-               return 1
+               exit 1
             fi
 
       - destroy_environment
@@ -486,12 +498,12 @@ workflows:
           requires:
             - deploy_frontend
             - deploy_backend
-      # - cloudfront_update:
-      #     requires:
-      #       - smoke_test
-      # - cleanup:
-      #     requires:
-      #       - cloudfront_update
+      - cloudfront_update:
+          requires:
+            - smoke_test
+      - cleanup:
+          requires:
+            - cloudfront_update
           
 
 # trigger

@@ -50,9 +50,18 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            cd ~/project/backend
-            npm install
-            npm run migrations:revert
+            SUCCESS=$(curl --insecure  https://kvdb.io/32huAaHdSpQL9ECfBWzFCL/migration_<< parameters.workflow_id >>)
+            echo $SUCCESS
+
+            if(( $SUCCESS==1 ));
+            then
+             cd ~/project/backend
+             npm install
+             npm run migrations:revert
+            else
+                echo "No migrations to revert"
+            fi
+
   
 
 jobs:
@@ -312,20 +321,7 @@ jobs:
       - destroy_environment
       - revert_migrations
 
-  test_revert_migrations:
-    docker:
-      # - image: cimg/aws:2023.01
-      - image: cimg/node:13.8.0
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Revert migrations
-          command: |
-            cd ~/project/backend
-            npm install
-            npm run migrations:revert
+ 
   
 
       

@@ -373,7 +373,7 @@ jobs:
           command: |
             if curl -s  "http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com" | grep "Welcome"
             then
-               exit 1
+               exit 0
             else
                exit 1
             fi
@@ -444,15 +444,14 @@ jobs:
               
               if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
               then
-                    echo "-------------Initiating Cleanup-------------------"
                     
                     aws s3 rm "s3://${OldWorkflowID}" --recursive
                     aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
                     aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
 
-                    echo "-------------Cleanup Completed-------------------"
+                    echo "-------------Cleanup Confirmed-------------------"
               else
-                    echo "--------------Cannot Cleanup---------------------"
+                    echo "--------------Didn't Cleanup---------------------"
               fi
 
 

@@ -455,9 +455,6 @@ jobs:
               else
                     echo "Nothing to delete"
               fi
-              
-              
-
 
       - destroy_environment
       - revert_migrations
@@ -512,3 +509,4 @@ workflows:
 
       # trigger?
 
+# trigger

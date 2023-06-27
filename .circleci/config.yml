@@ -185,7 +185,7 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> .circleci/ansible/inventory.txt
+            aws ec2 describe-instances --query 'Reservations[*].Instances[1].PublicIpAddress' --output text >> .circleci/ansible/inventory.txt
             cat .circleci/ansible/inventory.txt
       
       - ensure-backend-env-exists
@@ -267,7 +267,7 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)  
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[1].PublicIpAddress' --output text)  
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
@@ -279,10 +279,17 @@ jobs:
             cd frontend
             npm install
             npm run build
-            tar -czvf artifact-kk1j287dhjppmz548.tar.gz dist1
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-            aws s3 cp dist1 s3://udapeople-kk1j287dhjppmz548 --recursive
+
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm install
+            npm run build
+            tar -czvf artifact-kk1j287dhjppmz548.tar.gz dist
+            aws s3 cp dist s3://udapeople-kk1j287dhjppmz548 --recursive
 
 
       - destroy_environment
@@ -361,7 +368,7 @@ jobs:
       - run:
           name: Backend smoke test
           command: |
-            export BACKEND_IP_ADD=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+            export BACKEND_IP_ADD=$(aws ec2 describe-instances --query 'Reservations[*].Instances[1].PublicIpAddress' --output text)
             export API_URL="http://${BACKEND_IP_ADD}:3030"
             echo "${API_URL}"
 

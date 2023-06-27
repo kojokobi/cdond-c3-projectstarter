@@ -472,10 +472,9 @@ jobs:
               echo Stack names: "${STACKS[@]}"  
 
               
-              if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
+              if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldID}" ]]
               then
-                    
-                    aws s3 rm s3://${OldWorkflowID} --recursive
+                    aws s3 rm s3://udapeople-${OldID} --recursive
                     aws cloudformation delete-stack --stack-name "udapeople-backend-${OldID}"
                     aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldID}"
 

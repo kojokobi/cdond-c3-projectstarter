@@ -400,7 +400,7 @@ jobs:
       - dependencies
 
       - run:
-          name: Ensure back-end infrastructure exists
+          name: Create Old Id backend
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
@@ -461,6 +461,8 @@ jobs:
           command: |
              ## Fetch the Old workflow ID
               export OldWorkflowID=$(curl --insecure https://kvdb.io/32huAaHdSpQL9ECfBWzFCL/old_workflow_id)
+              export OldID=$(curl --insecure https://kvdb.io/32huAaHdSpQL9ECfBWzFCL/oldID)
+
               echo Old Wokflow ID: "$OldWorkflowID"
               echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
 
@@ -474,8 +476,8 @@ jobs:
               then
                     
                     aws s3 rm s3://${OldWorkflowID} --recursive
-                    aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-                    aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+                    aws cloudformation delete-stack --stack-name "udapeople-backend-${OldID}"
+                    aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldID}"
 
                     echo "-------------Cleanup Confirmed-------------------"
               else
